@@ -121,18 +121,43 @@ RC Table::create(
   return rc;
 }
 
-RC Table::destroy(const char* dir) {
+RC Table::destroy(const char* table_name,const char* path,const char* base_dir) {
   //刷新所有脏页
   RC rc = sync();
   if(rc != RC::SUCCESS) return rc;
 
   //TODO 删除描述表元数据的文件
+  std::string metaname = table_meta_file(base_dir, table_name);
+  int status = unlink(metaname.c_str());
+  if (status != 0){
+    LOG_ERROR("Failed to delete meta table %s.", metaname.c_str());
+    return RC::GENERIC_ERROR;
+  }
+
 
   //TODO 删除表数据文件
+  std::string dataname = table_data_file(base_dir, table_name );
+  status = unlink(dataname.c_str());
+  if (status != 0){
+    LOG_ERROR("Failed to delete data table %s.", dataname.c_str());
+    return RC::GENERIC_ERROR;
+  }
+
 
   //TODO 清理所有的索引相关文件数据与索引元数据
+  int index_num = table_meta_.index_num();
+  for (int i=0;i < index_num; i++) {
+    const IndexMeta* index_meta = table_meta_.index(i);
+    std::string indexname = table_index_file(base_dir, table_name, index_meta->name());
 
-  return RC::GENERIC_ERROR;
+    status = unlink(indexname.c_str());
+    if (status != 0){
+      LOG_ERROR("Failed to delete index table %s.", indexname.c_str());
+      return RC::GENERIC_ERROR;
+    }
+  }
+
+  return RC::SUCCESS;
 }
 
 
