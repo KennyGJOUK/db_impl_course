@@ -10,19 +10,12 @@
 		},
 		{
 			"len" : 4,
-			"name" : "c1",
+			"name" : "dmy",
 			"offset" : 4,
-			"type" : "ints",
-			"visible" : true
-		},
-		{
-			"len" : 4,
-			"name" : "c2",
-			"offset" : 8,
-			"type" : "ints",
+			"type" : "dates",
 			"visible" : true
 		}
 	],
 	"indexes" : null,
-	"table_name" : "table1"
+	"table_name" : "t"
 }

@@ -52,6 +52,70 @@ void value_init_float(Value *value, float v)
   value->data = malloc(sizeof(v));
   memcpy(value->data, &v, sizeof(v));
 }
+
+
+/*
+  date 
+*/
+int value_init_date(Value *value, const char *v) {
+  // TODO 将 value 的 type 属性修改为日期属性:DATES
+
+  // 从lex的解析中读取 year,month,day
+  int y,m,d;
+  sscanf(v, "%d-%d-%d", &y, &m, &d);//not check return value eq 3, lex guarantee
+  // 对读取的日期做合法性校验
+  bool b = check_date(y,m,d);
+  if(!b) return -1;
+  // TODO 将日期转换成整数
+  int data = 0;
+  int month_list[] = {31,27,21,30,31,30,31,31,30,31,30,31};
+  if (check_leap_year(y)){
+    month_list[1] = 28;
+  }
+  // year = y - 1970;
+  // month = m - 1;
+  for (int i = 1; i < m; i++){
+    data += month_list[i - 1];
+  }
+  data += d - 2;
+  for (int i = 1970; i < y; i++){
+    if (check_leap_year(i)) data += 366;
+    else data += 365;
+  }
+
+  // TODO 将value 的 data 属性修改为转换后的日期
+  value->type = DATES;
+  value->data = malloc(sizeof(data));
+  memcpy(value->data, &data, sizeof(data));
+  // value->data = (void *)(&data);
+
+  return data;
+}
+
+bool check_leap_year(int year){
+  return ((year % 4 == 0 && year % 100 != 0) || year % 400 == 0);
+}
+
+bool check_date(int y, int m, int d)
+{
+  // TODO 根据 y:year,m:month,d:day 校验日期是否合法
+  // TODO 合法 return 0
+  // TODO 不合法 return 1
+  if (y < 1970) return 0;
+  else if (y == 1970 && m == 1 && d < 2){
+    return 0;
+  }else {
+    if (m < 1 || m > 12) return 0;
+    int month_list[] = {31,27,21,30,31,30,31,31,30,31,30,31};
+    if (check_leap_year(y)){
+      month_list[1] = 28;
+    }
+    if (d > month_list[m - 1]) return 0;
+    else if (d < 1) return 0;
+  }
+  return 1;
+}
+
 void value_init_string(Value *value, const char *v)
 {
   value->type = CHARS;
